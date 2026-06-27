@@ -13,8 +13,9 @@ builder.Services
     .AddSingleton<ListMovieRepository>()
     .AddSingleton<DiscussionRepository>()
     .AddSingleton<BlobCacheService>()
-    .AddSingleton<DiscussionGenerationService>();
+    .AddSingleton<MovieCacheService>();
 
 builder.Services.AddHttpClient<TmdbClient>();
+builder.Services.AddHttpClient<DiscussionGenerationService>();
 
 builder.Build().Run();

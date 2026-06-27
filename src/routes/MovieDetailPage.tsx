@@ -15,6 +15,12 @@ export default function MovieDetailPage() {
 
   const { movie, discussionTopics } = data;
   const poster = posterUrl(movie.posterPath, 'w500');
+  const director = movie.crew.find((c) => c.job === 'Director')?.name;
+  const meta = [
+    movie.year?.toString(),
+    movie.certification,
+    movie.runtime ? `${movie.runtime} min` : undefined,
+  ].filter(Boolean) as string[];
 
   return (
     <article className="detail">
@@ -28,7 +34,35 @@ export default function MovieDetailPage() {
         {movie.title} {movie.year ? <span className="muted">({movie.year})</span> : null}
       </h1>
       {movie.tagline && <p className="tagline">{movie.tagline}</p>}
-      <p className="overview">{movie.overview}</p>
+
+      <div className="meta-row">
+        {movie.voteAverage > 0 && (
+          <span className="rating-badge">★ {movie.voteAverage.toFixed(1)}</span>
+        )}
+        {meta.map((m) => (
+          <span key={m} className="meta-chip">
+            {m}
+          </span>
+        ))}
+      </div>
+
+      {movie.genres.length > 0 && (
+        <div className="chips">
+          {movie.genres.map((g) => (
+            <span key={g} className="chip">
+              {g}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {director && (
+        <p className="director">
+          <span className="muted">Directed by</span> {director}
+        </p>
+      )}
+
+      {movie.overview && <p className="overview">{movie.overview}</p>}
 
       {movie.providers.length > 0 && (
         <section className="providers">
@@ -64,7 +98,8 @@ export default function MovieDetailPage() {
         ) : (
           <ul>
             {discussionTopics.map((t, i) => (
-              <li key={i}>
+              <li key={i} className="topic">
+                {t.category && <span className="topic-cat">{t.category}</span>}
                 <strong>{t.heading}</strong>
                 <p>{t.prompt}</p>
               </li>

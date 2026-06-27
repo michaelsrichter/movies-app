@@ -20,4 +20,3 @@ dotnet build api/MoviesApp.Api.csproj
 
 echo "Starting SWA (Vite + Functions)..."
 npm run dev:swa
-</content>

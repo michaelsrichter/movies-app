@@ -61,4 +61,3 @@ az role assignment create --assignee "$ME" --role "Storage Table Data Contributo
 az role assignment create --assignee "$ME" --role "Storage Blob Data Contributor" --scope "$SCOPE" >/dev/null
 
 echo "Done. Next: set app settings (see DEPLOY.md section 3)."
-</content>

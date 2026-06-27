@@ -3,11 +3,6 @@
   "platform": {
     "apiRuntime": "dotnet-isolated:9.0"
   },
-  "auth": {
-    "identityProviders": {
-      "github": {}
-    }
-  },
   "routes": [
     {
       "route": "/admin",
@@ -20,7 +15,7 @@
       "allowedRoles": ["admin"]
     },
     {
-      "route": "/api/admin/*",
+      "route": "/api/manage/*",
       "allowedRoles": ["admin"]
     },
     {
