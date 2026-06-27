@@ -19,6 +19,7 @@ public sealed class AdminFunctions
     private readonly TmdbClient _tmdb;
     private readonly DiscussionRepository _discussions;
     private readonly DiscussionGenerationService _generator;
+    private readonly BlobCacheService _cache;
 
     public AdminFunctions(
         ListRepository lists,
@@ -26,7 +27,8 @@ public sealed class AdminFunctions
         MovieCacheService movies,
         TmdbClient tmdb,
         DiscussionRepository discussions,
-        DiscussionGenerationService generator)
+        DiscussionGenerationService generator,
+        BlobCacheService cache)
     {
         _lists = lists;
         _listMovies = listMovies;
@@ -34,6 +36,7 @@ public sealed class AdminFunctions
         _tmdb = tmdb;
         _discussions = discussions;
         _generator = generator;
+        _cache = cache;
     }
 
     public sealed record CreateListRequest(string Title, string? Slug, string? Period, bool IsActive);
@@ -89,6 +92,51 @@ public sealed class AdminFunctions
     {
         await _lists.DeleteAsync(id, ct);
         return new NoContentResult();
+    }
+
+    [Function("AdminGetListMovies")]
+    public async Task<IActionResult> GetListMovies(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "manage/lists/{id}/movies")] HttpRequest req,
+        string id,
+        CancellationToken ct)
+    {
+        var movies = await _listMovies.GetForListAsync(id, ct);
+        var result = new List<object>();
+        foreach (var m in movies.OrderBy(x => x.Order))
+        {
+            var detail = await _cache.GetMovieAsync(m.TmdbId, ct);
+            var discussion = await _discussions.GetAsync(m.TmdbId, ct);
+            result.Add(new
+            {
+                tmdbId = m.TmdbId,
+                order = m.Order,
+                notes = m.Notes,
+                title = detail?.Title ?? $"#{m.TmdbId}",
+                year = detail?.Year,
+                posterPath = detail?.PosterPath,
+                certification = detail?.Certification,
+                runtime = detail?.Runtime,
+                discussionStatus = discussion?.Status ?? "none",
+                topicCount = discussion?.Topics.Count ?? 0,
+            });
+        }
+
+        return new OkObjectResult(result);
+    }
+
+    [Function("AdminGetDiscussion")]
+    public async Task<IActionResult> GetDiscussion(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "manage/movies/{tmdbId:int}/discussion")] HttpRequest req,
+        int tmdbId,
+        CancellationToken ct)
+    {
+        var discussion = await _discussions.GetAsync(tmdbId, ct);
+        if (discussion is null)
+        {
+            return new NotFoundResult();
+        }
+
+        return new OkObjectResult(discussion);
     }
 
     [Function("AdminAddMovie")]
@@ -153,7 +201,34 @@ public sealed class AdminFunctions
         }
 
         int? year = int.TryParse(req.Query["year"].ToString(), out var y) ? y : null;
-        var results = await _tmdb.SearchAsync(q, year, ct);
+        var raw = await _tmdb.SearchAsync(q, year, ct);
+
+        var results = new List<object>();
+        if (raw.TryGetProperty("results", out var arr) && arr.ValueKind == System.Text.Json.JsonValueKind.Array)
+        {
+            foreach (var item in arr.EnumerateArray())
+            {
+                int? releaseYear = null;
+                if (item.TryGetProperty("release_date", out var rd) &&
+                    rd.ValueKind == System.Text.Json.JsonValueKind.String &&
+                    DateTime.TryParse(rd.GetString(), out var dt))
+                {
+                    releaseYear = dt.Year;
+                }
+
+                results.Add(new
+                {
+                    tmdbId = item.TryGetProperty("id", out var idEl) ? idEl.GetInt32() : 0,
+                    title = item.TryGetProperty("title", out var t) ? t.GetString() : null,
+                    year = releaseYear,
+                    posterPath = item.TryGetProperty("poster_path", out var p) && p.ValueKind == System.Text.Json.JsonValueKind.String
+                        ? p.GetString()
+                        : null,
+                    overview = item.TryGetProperty("overview", out var o) ? o.GetString() : null,
+                });
+            }
+        }
+
         return new OkObjectResult(results);
     }
 

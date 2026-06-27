@@ -84,8 +84,107 @@ async function getJson<T>(url: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+async function sendJson<T>(method: string, url: string, body?: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method,
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Request failed: ${res.status}${text ? ` — ${text}` : ''}`);
+  }
+  if (res.status === 204) return undefined as T;
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
 export const api = {
   getCurrentList: () => getJson<MovieList>('/api/lists/current'),
   getMovie: (tmdbId: number | string) =>
     getJson<{ movie: MovieDetail; discussionTopics: DiscussionTopic[] }>(`/api/movies/${tmdbId}`),
+};
+
+// ---- Auth (SWA built-in) ----
+export interface ClientPrincipal {
+  identityProvider: string;
+  userId: string;
+  userDetails: string;
+  userRoles: string[];
+}
+
+export async function getCurrentUser(): Promise<ClientPrincipal | null> {
+  try {
+    const res = await fetch('/.auth/me', { headers: { Accept: 'application/json' } });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { clientPrincipal: ClientPrincipal | null };
+    return data.clientPrincipal;
+  } catch {
+    return null;
+  }
+}
+
+// ---- Admin (role: admin, /api/manage/*) ----
+export interface TmdbSearchResult {
+  tmdbId: number;
+  title: string;
+  year?: number;
+  posterPath?: string;
+  overview?: string;
+}
+
+export interface AdminListMovie {
+  tmdbId: number;
+  order: number;
+  notes?: string;
+  title: string;
+  year?: number;
+  posterPath?: string;
+  certification?: string;
+  runtime?: number;
+  discussionStatus: 'none' | 'draft' | 'published';
+  topicCount: number;
+}
+
+export interface Discussion {
+  tmdbId: number;
+  topics: DiscussionTopic[];
+  source: string;
+  status: 'draft' | 'published';
+  model?: string;
+  generatedUtc?: string;
+  approvedBy?: string;
+  approvedUtc?: string;
+}
+
+export const admin = {
+  getLists: () => getJson<MovieList[]>('/api/manage/lists'),
+  createList: (body: { title: string; slug?: string; period?: string; isActive: boolean }) =>
+    sendJson<MovieList>('POST', '/api/manage/lists', body),
+  deleteList: (id: string) => sendJson<void>('DELETE', `/api/manage/lists/${id}`),
+  getListMovies: (id: string) => getJson<AdminListMovie[]>(`/api/manage/lists/${id}/movies`),
+  addMovie: (id: string, tmdbId: number) =>
+    sendJson<unknown>('POST', `/api/manage/lists/${id}/movies`, { tmdbId }),
+  removeMovie: (id: string, tmdbId: number) =>
+    sendJson<void>('DELETE', `/api/manage/lists/${id}/movies/${tmdbId}`),
+  refreshMovie: (tmdbId: number) =>
+    sendJson<unknown>('POST', `/api/manage/movies/${tmdbId}/refresh`),
+  searchTmdb: (q: string, year?: number) =>
+    getJson<TmdbSearchResult[]>(
+      `/api/manage/tmdb/search?q=${encodeURIComponent(q)}${year ? `&year=${year}` : ''}`,
+    ),
+  getDiscussion: async (tmdbId: number): Promise<Discussion | null> => {
+    const res = await fetch(`/api/manage/movies/${tmdbId}/discussion`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+    return (await res.json()) as Discussion;
+  },
+  generateDiscussion: (tmdbId: number) =>
+    sendJson<Discussion>('POST', `/api/manage/movies/${tmdbId}/discussion/generate`),
+  updateDiscussion: (
+    tmdbId: number,
+    body: { topics?: DiscussionTopic[]; status?: string; approvedBy?: string },
+  ) => sendJson<Discussion>('PATCH', `/api/manage/movies/${tmdbId}/discussion`, body),
 };
