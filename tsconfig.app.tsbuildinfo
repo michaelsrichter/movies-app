@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/Attribution.tsx","./src/components/Poster.tsx","./src/components/Skeletons.tsx","./src/lib/api.ts","./src/routes/AdminPage.tsx","./src/routes/ListPage.tsx","./src/routes/MovieDetailPage.tsx","./src/routes/router.tsx"],"version":"5.9.3"}

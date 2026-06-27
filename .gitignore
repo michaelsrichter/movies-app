@@ -1,0 +1,36 @@
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.local
+.env
+.env.*
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Azure Functions / SWA
+api/local.settings.json
+local.settings.json
+.azurefunctions/
+.swa/
+
+# Editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local artifacts
+*.pem
+*.pfx
+secrets/

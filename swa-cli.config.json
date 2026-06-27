@@ -1,0 +1,16 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "movies-app": {
+      "appLocation": ".",
+      "apiLocation": "api",
+      "outputLocation": "dist",
+      "appDevserverUrl": "http://localhost:5173",
+      "apiLanguage": "dotnet-isolated",
+      "apiVersion": "9.0",
+      "run": "npm run dev",
+      "appBuildCommand": "npm run build",
+      "apiBuildCommand": "dotnet publish -c Release"
+    }
+  }
+}

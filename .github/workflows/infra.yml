@@ -1,0 +1,46 @@
+name: Infra (Bicep)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'what-if or deploy'
+        required: true
+        default: 'what-if'
+        type: choice
+        options: [what-if, deploy]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: rg-movies
+  LOCATION: eastus2
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: What-if
+        if: ${{ inputs.mode == 'what-if' }}
+        run: |
+          az deployment group what-if \
+            -g "$RESOURCE_GROUP" \
+            -f infra/main.bicep \
+            -p infra/main.parameters.json
+      - name: Deploy
+        if: ${{ inputs.mode == 'deploy' }}
+        run: |
+          az deployment group create \
+            -g "$RESOURCE_GROUP" \
+            -f infra/main.bicep \
+            -p infra/main.parameters.json

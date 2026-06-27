@@ -1,0 +1,20 @@
+{
+  "//": "Copy to local.settings.json (gitignored) and fill in values for local dev.",
+  "//Storage": "Leave Storage__ConnectionString EMPTY locally so DefaultAzureCredential (az login) is used.",
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "AzureWebJobsStorage": "",
+
+    "Storage__AccountName": "your-storage-account-name",
+    "Storage__ConnectionString": "",
+
+    "Tmdb__ReadAccessToken": "your-tmdb-bearer-read-access-token",
+    "Tmdb__BaseUrl": "https://api.themoviedb.org/3",
+    "Tmdb__Region": "US",
+
+    "AzureAI__Endpoint": "https://richtercloud-0138-resource.openai.azure.com/",
+    "AzureAI__Deployment": "gpt-4o-mini",
+    "AzureAI__ApiKey": "your-azure-ai-foundry-key"
+  }
+}
