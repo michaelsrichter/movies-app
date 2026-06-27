@@ -24,45 +24,49 @@ export default function MovieDetailPage() {
 
   return (
     <article className="detail">
-      {poster && (
-        <>
-          <link rel="preload" as="image" href={poster} />
-          <img className="detail-poster" src={poster} alt={movie.title} />
-        </>
-      )}
-      <h1 className="page-title">
-        {movie.title} {movie.year ? <span className="muted">({movie.year})</span> : null}
-      </h1>
-      {movie.tagline && <p className="tagline">{movie.tagline}</p>}
-
-      <div className="meta-row">
-        {movie.voteAverage > 0 && (
-          <span className="rating-badge">★ {movie.voteAverage.toFixed(1)}</span>
+      <div className="detail-hero">
+        {poster && (
+          <>
+            <link rel="preload" as="image" href={poster} />
+            <img className="detail-poster" src={poster} alt={movie.title} />
+          </>
         )}
-        {meta.map((m) => (
-          <span key={m} className="meta-chip">
-            {m}
-          </span>
-        ))}
-      </div>
+        <div className="detail-headinfo">
+          <h1 className="page-title">
+            {movie.title} {movie.year ? <span className="muted">({movie.year})</span> : null}
+          </h1>
+          {movie.tagline && <p className="tagline">{movie.tagline}</p>}
 
-      {movie.genres.length > 0 && (
-        <div className="chips">
-          {movie.genres.map((g) => (
-            <span key={g} className="chip">
-              {g}
-            </span>
-          ))}
+          <div className="meta-row">
+            {movie.voteAverage > 0 && (
+              <span className="rating-badge">★ {movie.voteAverage.toFixed(1)}</span>
+            )}
+            {meta.map((m) => (
+              <span key={m} className="meta-chip">
+                {m}
+              </span>
+            ))}
+          </div>
+
+          {movie.genres.length > 0 && (
+            <div className="chips">
+              {movie.genres.map((g) => (
+                <span key={g} className="chip">
+                  {g}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {director && (
+            <p className="director">
+              <span className="muted">Directed by</span> {director}
+            </p>
+          )}
+
+          {movie.overview && <p className="overview">{movie.overview}</p>}
         </div>
-      )}
-
-      {director && (
-        <p className="director">
-          <span className="muted">Directed by</span> {director}
-        </p>
-      )}
-
-      {movie.overview && <p className="overview">{movie.overview}</p>}
+      </div>
 
       {movie.providers.length > 0 && (
         <section className="providers">
