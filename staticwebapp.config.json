@@ -42,7 +42,10 @@
   },
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{png,jpg,jpeg,gif,webp,svg,ico,css,js}"]
+    "exclude": [
+      "/assets/*",
+      "/*.{png,jpg,jpeg,gif,webp,svg,ico,css,js,txt,xml,json,webmanifest}"
+    ]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
@@ -52,6 +55,8 @@
     "Content-Security-Policy": "default-src 'self'; img-src 'self' https://image.tmdb.org data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com; frame-ancestors 'none'; base-uri 'self'"
   },
   "mimeTypes": {
-    ".json": "application/json"
+    ".json": "application/json",
+    ".webmanifest": "application/manifest+json",
+    ".xml": "application/xml"
   }
 }

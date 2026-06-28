@@ -3,11 +3,20 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { Poster } from '../components/Poster';
 import { ListPageSkeleton } from '../components/Skeletons';
+import { useSeo } from '../lib/seo';
 
 export default function ListPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['current-list'],
     queryFn: api.getCurrentList,
+  });
+
+  useSeo({
+    title: data?.title,
+    description: data
+      ? `${data.title}${data.period ? ` (${data.period})` : ''} — a curated family movie watchlist with discussion topics for parents and teens.`
+      : undefined,
+    path: '/',
   });
 
   if (isLoading) return <ListPageSkeleton />;

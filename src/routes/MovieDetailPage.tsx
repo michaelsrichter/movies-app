@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { api, posterUrl } from '../lib/api';
+import { useSeo } from '../lib/seo';
 
 export default function MovieDetailPage() {
   const { tmdbId } = useParams();
@@ -8,6 +9,15 @@ export default function MovieDetailPage() {
     queryKey: ['movie', tmdbId],
     queryFn: () => api.getMovie(tmdbId!),
     enabled: !!tmdbId,
+  });
+
+  const movieData = data?.movie;
+  const seoPoster = posterUrl(movieData?.posterPath, 'w500');
+  useSeo({
+    title: movieData ? `${movieData.title}${movieData.year ? ` (${movieData.year})` : ''}` : undefined,
+    description: movieData?.overview,
+    path: tmdbId ? `/movie/${tmdbId}` : undefined,
+    image: seoPoster ?? undefined,
   });
 
   if (isLoading) return <p className="empty">Loading…</p>;
@@ -22,8 +32,34 @@ export default function MovieDetailPage() {
     movie.runtime ? `${movie.runtime} min` : undefined,
   ].filter(Boolean) as string[];
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Movie',
+    name: movie.title,
+    ...(movie.year ? { datePublished: String(movie.year) } : {}),
+    ...(movie.overview ? { description: movie.overview } : {}),
+    ...(poster ? { image: poster } : {}),
+    ...(director ? { director: { '@type': 'Person', name: director } } : {}),
+    ...(movie.genres.length ? { genre: movie.genres } : {}),
+    ...(movie.voteAverage > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: movie.voteAverage.toFixed(1),
+            bestRating: '10',
+            ratingCount: Math.max(movie.voteCount ?? 1, 1),
+          },
+        }
+      : {}),
+  };
+
   return (
     <article className="detail">
+      <script
+        type="application/ld+json"
+        // Structured data for search engines; safe static JSON, not user input.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="detail-hero">
         {poster && (
           <>

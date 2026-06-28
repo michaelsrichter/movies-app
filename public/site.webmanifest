@@ -1,0 +1,17 @@
+{
+  "name": "Family Movie Watchlist",
+  "short_name": "Movie Watchlist",
+  "description": "A curated family movie watchlist with trailers and discussion topics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

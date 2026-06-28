@@ -36,6 +36,8 @@ function lazyWithReload<T extends ComponentType<unknown>>(
 const ListPage = lazyWithReload(() => import('./ListPage'), 'list');
 const MovieDetailPage = lazyWithReload(() => import('./MovieDetailPage'), 'movie');
 const AdminPage = lazyWithReload(() => import('./AdminPage'), 'admin');
+const PrivacyPage = lazyWithReload(() => import('./PrivacyPage'), 'privacy');
+const TermsPage = lazyWithReload(() => import('./TermsPage'), 'terms');
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +65,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<ListPageSkeleton />}>
             <AdminPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'privacy',
+        element: (
+          <Suspense fallback={<ListPageSkeleton />}>
+            <PrivacyPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'terms',
+        element: (
+          <Suspense fallback={<ListPageSkeleton />}>
+            <TermsPage />
           </Suspense>
         ),
       },
