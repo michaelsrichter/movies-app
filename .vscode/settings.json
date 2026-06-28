@@ -8,6 +8,5 @@
     "editor.defaultFormatter": "ms-dotnettools.csharp",
     "editor.tabSize": 4
   },
-  "files.eol": "\n",
-  "dotnet.defaultSolution": "api/MoviesApp.Api.csproj"
+  "files.eol": "\n"
 }

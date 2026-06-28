@@ -45,7 +45,7 @@ public sealed class TmdbClient
     /// <summary>Fetch the full movie payload (details + credits + keywords + providers + release dates).</summary>
     public async Task<JsonElement> GetMovieRawAsync(int tmdbId, CancellationToken ct)
     {
-        var url = $"movie/{tmdbId}?append_to_response=credits,keywords,watch/providers,release_dates";
+        var url = $"movie/{tmdbId}?append_to_response=credits,keywords,watch/providers,release_dates,videos";
         return await GetJsonAsync(url, ct);
     }
 

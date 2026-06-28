@@ -68,6 +68,21 @@ export default function MovieDetailPage() {
         </div>
       </div>
 
+      {movie.trailerKey && (
+        <section className="trailer">
+          <h2>Trailer</h2>
+          <div className="video-frame">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${movie.trailerKey}`}
+              title={`${movie.title} trailer`}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </section>
+      )}
+
       {movie.providers.length > 0 && (
         <section className="providers">
           <h2>Where to watch (US)</h2>

@@ -213,6 +213,33 @@ public static class TmdbMapper
             }
         }
 
+        // Videos (trailers/teasers). Keep YouTube entries and pick the best trailer.
+        if (root.TryGetProperty("videos", out var videos) &&
+            videos.TryGetProperty("results", out var vidResults) && vidResults.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var v in vidResults.EnumerateArray())
+            {
+                detail.Videos.Add(new MovieVideo
+                {
+                    Key = v.GetStringOrNull("key") ?? string.Empty,
+                    Name = v.GetStringOrNull("name"),
+                    Site = v.GetStringOrNull("site") ?? string.Empty,
+                    Type = v.GetStringOrNull("type"),
+                    Official = v.GetBoolOrDefault("official"),
+                    Size = v.GetNullableInt("size"),
+                    PublishedAt = v.GetStringOrNull("published_at"),
+                });
+            }
+
+            detail.TrailerKey = detail.Videos
+                .Where(v => v.Site.Equals("YouTube", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(v.Key))
+                .OrderByDescending(v => v.Type == "Trailer")
+                .ThenByDescending(v => v.Official)
+                .ThenByDescending(v => v.Type == "Teaser")
+                .Select(v => v.Key)
+                .FirstOrDefault();
+        }
+
         return detail;
     }
 }

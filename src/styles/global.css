@@ -182,6 +182,32 @@ body {
   line-height: 1.55;
 }
 
+.trailer {
+  margin-top: 24px;
+}
+
+.trailer h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .providers ul,
 .cast ul:not(.cast-carousel),
 .discussion ul {

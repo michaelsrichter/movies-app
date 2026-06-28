@@ -81,6 +81,11 @@ public sealed class MovieDetail
     public List<WatchProvider> Providers { get; set; } = new();
     public string? ProvidersLink { get; set; }
 
+    // Media (trailers/teasers from TMDB /videos)
+    public List<MovieVideo> Videos { get; set; } = new();
+    /// <summary>YouTube key of the best available trailer (official trailer preferred), if any.</summary>
+    public string? TrailerKey { get; set; }
+
     // Cache audit
     public string? ETag { get; set; }
     public DateTimeOffset LastFetchedUtc { get; set; }
@@ -116,6 +121,17 @@ public sealed class ProductionCompany
     public string Name { get; set; } = string.Empty;
     public string? LogoPath { get; set; }
     public string? OriginCountry { get; set; }
+}
+
+public sealed class MovieVideo
+{
+    public string Key { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string Site { get; set; } = string.Empty;
+    public string? Type { get; set; }
+    public bool Official { get; set; }
+    public int? Size { get; set; }
+    public string? PublishedAt { get; set; }
 }
 
 public sealed class ReleaseDateInfo

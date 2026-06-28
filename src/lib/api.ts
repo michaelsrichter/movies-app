@@ -28,6 +28,14 @@ export interface CrewMember {
   job: string;
 }
 
+export interface MovieVideo {
+  key: string;
+  name?: string;
+  site: string;
+  type?: string;
+  official: boolean;
+}
+
 export interface MovieDetail {
   tmdbId: number;
   title: string;
@@ -47,8 +55,9 @@ export interface MovieDetail {
   cast: CastMember[];
   crew: CrewMember[];
   providers: WatchProvider[];
+  videos: MovieVideo[];
+  trailerKey?: string;
 }
-
 export interface DiscussionTopic {
   heading: string;
   prompt: string;
